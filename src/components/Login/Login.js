@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useContext } from 'react';
 import { UserContext } from '../../App';
 import { useHistory, useLocation } from 'react-router-dom';
-import { handleFBLogin, handleGoogleSingIn, handleSingOut, initializeLoginFramework } from './loginManager';
+import { createUserWithEmailAndPassword, handleFBLogin, handleGoogleSingIn, handleSingOut, initializeLoginFramework, signInWithEmailAndPassword } from './loginManager';
 
 
 
@@ -27,15 +27,13 @@ let { from } = location.state || { from: { pathname: "/" } };
 const googleSingIn = () => {
   handleGoogleSingIn()
   .then(res => {
-    setUser(res);
-    setLoggedInUser(res);
+    handleResponse(res, true);
   })
 }
 const fbLogin = () => {
   handleFBLogin()
   .then(res => {
-    setUser(res);
-    setLoggedInUser(res);
+   handleResponse(res, true)
   })
   
 
@@ -44,9 +42,17 @@ const fbLogin = () => {
 const singOut = ()=>{
   handleSingOut()
   .then(res => {
-    setUser(res);
-    setLoggedInUser(res);
+    handleResponse(res , false)
   })
+}
+
+const handleResponse = (res, redirect) => {
+  setUser(res);
+    setLoggedInUser(res);
+    if(redirect){
+      
+    history.replace(from);
+    }
 }
 
 
@@ -70,14 +76,19 @@ let isFieldValid = true ;
   }
 
   const handleSubmit = (e) => {
-    // console.log(user.email , user.password)
     if( newUser && user.email && user.password){
       
-       
+       createUserWithEmailAndPassword(user.name, user.email, user.password)
+       .then(res => {
+        handleResponse(res, true)
+       })
     }
 
 if(!newUser && user.email && user.password){
- 
+ signInWithEmailAndPassword(user.email, user.password)
+ .then(res => {
+  handleResponse(res, true)
+ })
 }
 
 

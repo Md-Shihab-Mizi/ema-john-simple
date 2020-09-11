@@ -2,10 +2,18 @@ import * as firebase from "firebase/app";
 import "firebase/auth";
 import firebaseConfig from './firebase.config';
 
-firebase.initializeApp(firebaseConfig);
-export const initializeLoginFramework = () => {
-    firebase.initializeApp(firebaseConfig);
-}
+
+
+
+// firebase.initializeApp(firebaseConfig);
+// export const initializeLoginFramework = () => {
+//     firebase.initializeApp(firebaseConfig);
+// }
+export const initializeLoginFramework = () =>{
+  if(firebase.apps.length === 0){
+     firebase.initializeApp(firebaseConfig);
+    }
+};
 
 
 
@@ -20,10 +28,11 @@ export const handleGoogleSingIn = () => {
           isSignIn: true,
           name: displayName,
           email: email,
-          photo: photoURL
+          photo: photoURL,
+          success: true
         }
         return signedInUser ;
-        console.log(displayName, email, photoURL);
+        // console.log(displayName, email, photoURL);
       })
       .catch(err => {
         console.log(err);
@@ -39,6 +48,7 @@ export const handleGoogleSingIn = () => {
     return firebase.auth().signInWithPopup(fbProvider).then(function(result) {
       var token = result.credential.accessToken;
       var user = result.user;
+      user.success = true;
       return user;
     }).catch(function(error) {
       var errorCode = error.code;
@@ -67,54 +77,50 @@ export const handleGoogleSingIn = () => {
       })
   }
 
-//   export const createUserWithEmailAndPassword = () =>{
-//     firebase.auth().createUserWithEmailAndPassword(user.email, user.password)
-//     .then(res => {
-//       const newUserInfo = {...user};
-//       newUserInfo.error = '';
-//       newUserInfo.success = true;
-//      setUser(newUserInfo);
-//      updateUserName(user.name);
-//     })
-//     .catch(error => {
-//       // Handle Errors here.
-//      const newUserInfo ={...user};
-//      newUserInfo.error = error.message
-//      newUserInfo.success = false;
-//       setUser(newUserInfo);
-//       // ...
-//     });
-//   }
+  export const createUserWithEmailAndPassword = (name, email, password) =>{
+   return  firebase.auth().createUserWithEmailAndPassword(email, password)
+    .then(res => {
+      const newUserInfo = res.user;
+      newUserInfo.error = '';
+      newUserInfo.success = true;
+     updateUserName(name);
+     return newUserInfo;
+    })
+    .catch(error => {
+      // Handle Errors here.
+     const newUserInfo = {};
+     newUserInfo.error = error.message
+     newUserInfo.success = false;
+     return newUserInfo;
+    });
+  }
 
 
-//   export const signInWithEmailAndPassword = () =>{
-//     firebase.auth().signInWithEmailAndPassword(user.email, user.password)
-//     .then(res =>{
-//       const newUserInfo = {...user};
-//       newUserInfo.error = '';
-//       newUserInfo.success = true;
-//      setUser(newUserInfo);
-//      setLoggedInUser(newUserInfo);
-//      history.replace(from);
-//      console.log('sing in user info', res.user)
-//     })
-//     .catch(function(error) {
-//       const newUserInfo ={...user};
-//       newUserInfo.error = error.message
-//       newUserInfo.success = false;
-//        setUser(newUserInfo);
-//     });
-//   }
+  export const signInWithEmailAndPassword = (email,password) =>{
+   return firebase.auth().signInWithEmailAndPassword(email, password)
+    .then(res =>{
+      const newUserInfo = res.user;
+      newUserInfo.error = '';
+      newUserInfo.success = true;
+   return newUserInfo;
+    })
+    .catch(function(error) {
+      const newUserInfo ={};
+      newUserInfo.error = error.message
+      newUserInfo.success = false;
+       return newUserInfo;
+    });
+  }
 
-//   const updateUserName = name => {
-//     const user = firebase.auth().currentUser;
+  const updateUserName = name => {
+    const user = firebase.auth().currentUser;
 
-//     user.updateProfile({
-//       displayName: name,
-//     }).then(function() {
-//       console.log('user name updated successfully')
-//     }).catch(function(error) {
-//      console.log(error)
-//     });
-//   }
+    user.updateProfile({
+      displayName: name,
+    }).then(function() {
+      console.log('user name updated successfully')
+    }).catch(function(error) {
+     console.log(error)
+    });
+  }
 
